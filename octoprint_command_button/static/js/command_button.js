@@ -10,7 +10,7 @@ $(function () {
         self.selected_command = ko.observable();
 
         self.onBeforeBinding = function () {
-            //$('#command_button').appendTo('#term');
+            self.settings = self.settingsViewModel.settings;
             self.multidimensional_array = ko.computed(function () {
                 let matrix = [[]], column_counter = 0, row_counter = 0;
                 ko.utils.arrayForEach(self.settingsViewModel.settings.plugins.command_button.commands(), function (item) {
@@ -129,8 +129,32 @@ $(function () {
                     }
                 });
             } else {
-                OctoPrint.control.sendGcodeWithParameters(gcode_cmds, parameters);
+                console.log("data", data)
+                OctoPrint.system.executeCommand("custom", data.label());
+                $.ajax({
+                    url: API_BASEURL + "settings",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        console.log("Get system commands", response.system.actions)
+                    }
+                });
             }
+        };
+
+        self.onSettingsBeforeSave = function () {
+            var customs = []
+            _.each(self.settingsViewModel.settings.plugins.command_button.commands(), function (command) {
+                var systemCommand = {
+                    command: command.command(),
+                    action: command.label(),
+                    name: command.label(),
+                    source: "custom"
+                }
+                customs.push(systemCommand)
+            })
+            console.log("customs", customs)
+            self.settingsViewModel.system_actions(customs)
         };
     }
 

@@ -1,0 +1,91 @@
+<h4>Buttons to Add to NavBar</h4>
+<div id="command_button_custom_commands" class="row-fluid">
+	<div class="row-fluid">
+		<div class="span8">Click on button to configure options.</div>
+		<div class="span4" style="text-align: center;"><button class="btn btn-mini" data-bind="click: addCommand" title="Add custom command button"><i class="fa fa-plus"></i> Add Button</button><button class="btn btn-mini" data-bind="click: addBreak" title="Add Line Break"><i class="fa fa-plus"></i> Add Break</button></div>
+	</div>
+    <div class="row-fluid" data-bind="foreach: multidimensional_array">
+        <div class="row-fluid">
+        <!-- ko foreach: $data -->
+            <div data-bind="css: [((offset() > 0) ? 'offset'+offset() : ''), ((label() === '<BR>') ? 'row-fluid': 'span'+width())].join(' ')">
+                <div style="margin-bottom: 5px; margin-left: 0;" data-bind="css: ['btn-group', ((offset() > 0) ? 'offset'+offset() : ''), ((label() === '<BR>') ? 'row-fluid': 'span'+width())].join(' ')">
+                    <button type="button" class="btn" data-bind="visible: label() !== '<BR>', click: $root.showEditor, attr: {title: (tooltip() ? tooltip : command)}">
+						<i class="fa-lg" data-bind="css: icon"></i>
+						<span data-bind="text: label">
+					</span>
+					</button>
+                    <button type="button" class="btn btn-mini move_command" title="Move button">
+                        <i class="fa fa-arrows"></i>
+                    </button>
+                    <button type="button" class="btn btn-mini copy_command" data-bind="click: $root.copyCommand" title="Copy button">
+                        <i class="fa fa-copy"></i>
+                    </button>
+                    <button type="button" class="btn btn-mini btn-danger removeJob" data-bind="click: $root.removeCommand" title="Delete button">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        <!-- /ko -->
+        </div>
+    </div>
+</div>
+
+<div id="command_button_editor" data-bind="with: selected_command" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
+		<h3>Terminal Command Editor</h3>
+	</div>
+	<div class="modal-body">
+		<div class="controls">
+			<label class="control-label">{{ _('Icon') }}</label>
+			<input type="text" class="input-block-level" data-bind="value: icon, iconpicker: icon,iconpickerOptions: {hideOnSelect: true, collision: true}"/>
+		</div>
+		<div class="controls"><label class="control-label">{{ _('Label') }}</label><input type="text" class="input-block-level" data-bind="value: label"/></div>
+		<div class="controls"><label class="control-label">{{ _('Tooltip') }}</label><input type="text" class="input-block-level" data-bind="value: tooltip"/></div>
+        <div class="row-fluid">
+            <div class="span6"><div class="controls"><label class="control-label">{{ _('Width') }}</label><input type="number" min="0" class="input-block-level" data-bind="value: width"/></div></div>
+            <div class="span6"><div class="controls"><label class="control-label">{{ _('Offset') }}</label><input type="number" min="0" class="input-block-level" data-bind="value: offset"/></div></div>
+        </div>
+        <div class="controls"><label class="checkbox">{{ _('Enabled While Printing') }}<input type="checkbox" data-bind="checked: enabled_while_printing" title="Prompt for Confirmation"/></label></div>
+		<div class="controls"><label class="checkbox">{{ _('Confirm') }}<input type="checkbox" data-bind="checked: confirmation" title="Prompt for Confirmation"/></label></div>
+		<!-- ko if: confirmation -->
+		<div class="controls"><label class="control-label">{{ _('Message') }}</label><input type="text" class="input-block-level" data-bind="value: message"/></div>
+		<!-- /ko -->
+		<div class="controls"><label class="control-label">{{ _('Command') }}</label><textarea class="input-block-level" id="command_button_command" rows="4" data-bind="value: command"></textarea></div>
+		<div>
+			<div><small><a href="#" class="muted" data-bind="toggleContent: { class: 'fa-caret-right fa-caret-down', container: '#command_button_editor .parameters' }"><i class="fa fa-caret-right"></i> Command Parameters</a></small></div>
+			<div class="parameters row-fluid" data-bind="style: { display: input().length > 0 ? 'block' : 'none' }">
+				<div class="row-fluid">
+					<div class="span4">Label</div>
+					<div class="span3">Parameter</div>
+					<div class="span4">Default</div>
+					<div class="span1"><button class="btn btn-mini" data-bind="click: $root.addParameter" title="Add Command Paramter"><i class="fa fa-plus"></i></button></div>
+				</div>
+				<!-- ko foreach: input -->
+					<div class="row-fluid">
+						<div class="span4"><input type="text" class="input-block-level" data-bind="value: label"/></div>
+						<div class="span3"><input type="text" class="input-block-level" data-bind="value: parameter"/></div>
+						<div class="span4"><input type="text" class="input-block-level" data-bind="value: value"/></div>
+						<div class="span1">
+							<div class="btn-group" style="padding-top: 3px;">
+								<button class="btn btn-mini" data-bind="click: $root.insertParameter" title="Append to End of Command Input Above"><i class="fa fa-plus"></i></button>
+								<button class="btn btn-mini btn-danger" data-bind="click: $root.removeParameter" title="Remove Command Parameter"><i class="fa fa-times"></i></button>
+							</div>
+						</div>
+					</div>
+				<!-- /ko -->
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<div class="row-fluid" style="text-align: center;">
+			<div class="btn-group" style="display: inline-block; margin-left: 0px;">
+			<!-- ko foreach: input -->
+				<span style="cursor: default" data-bind="text: label" class="btn"></span>
+				<input type="text" class="input-mini btn active" style="cursor: text;" data-bind="attr: {placeholder: label}, value: value">
+			<!-- /ko -->
+				<button type="button" class="btn" data-dismiss="modal" data-bind="attr: {title: (tooltip() ? tooltip : command)}"><i class="fa-lg" data-bind="css: icon"></i> <span data-bind="text: label"></span></button>
+			</div>
+		</div>
+	</div>
+</div>
